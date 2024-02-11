@@ -1,7 +1,6 @@
 
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
-import { validate } from 'uuid';
 // In-memory database
 type User = {
   id: string,
@@ -86,7 +85,23 @@ const server: Server = createServer((req: IncomingMessage, res: ServerResponse) 
         }
       });
   }
-}else {
+} else if (req.url?.startsWith(ENDPOINTS.users) && req.method === 'DELETE') {
+  const id: string = req.url.split('/')[3];
+  if (!uuidValidate(id)) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ message: 'Ooops! UserId is invalid (not uuid)' }));
+  } else {
+    const userIndex = USERS_DB.findIndex(user => user.id === id);
+    if (userIndex === -1) {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ message: 'Oops, User with the provided userId does not exist!' }));
+    } else {
+      USERS_DB.splice(userIndex, 1);
+      res.writeHead(204, { 'Content-Type': 'application/json' });
+      res.end();
+    }
+  }
+} else {
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ message: 'Oops, this route does not exist!' }));
   }
