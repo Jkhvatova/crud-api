@@ -1,6 +1,7 @@
 
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
+import { validate } from 'uuid';
 // In-memory database
 type User = {
   id: string,
@@ -25,13 +26,18 @@ const server: Server = createServer((req: IncomingMessage, res: ServerResponse) 
     res.end(JSON.stringify(USERS_DB));
   } else if (req.url?.startsWith(ENDPOINTS.users) && req.method === 'GET') {
     const id: string = req.url.split('/')[3];
-    const user = USERS_DB.find(user => user.id === id);
-    if (user) {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(user));
+    if (!uuidValidate(id)) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ message: 'Ooops! UserId is invalid (not uuid)' }));
     } else {
-      res.writeHead(404, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ message: 'Oops, I cannot find that user:(' }));
+      const user = USERS_DB.find(user => user.id === id);
+      if (user) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(user));
+      } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Oops, User with the provided userId does not exist!' }));
+      }
     }
   } else if (req.url === ENDPOINTS.users && req.method === 'POST') {
     let body = '';
@@ -55,12 +61,34 @@ const server: Server = createServer((req: IncomingMessage, res: ServerResponse) 
         res.writeHead(201, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(newUser));
       }
-
     });
+  } else if (req.url?.startsWith(ENDPOINTS.users) && req.method === 'PUT') {
+    const id: string = req.url.split('/')[3];
+    if (!uuidValidate(id)) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ message: 'Ooops! UserId is invalid (not uuid)' }));
+    } else {
+      let body = '';
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+      req.on('end', () => {
+        const updatedUserData: Partial<User> = JSON.parse(body);
+        const userIndex = USERS_DB.findIndex(user => user.id === id);
+        if (userIndex === -1) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ message: 'Oops, User with the provided userId does not exist!' }));
+        } else {
+          const updatedUser = { ...USERS_DB[userIndex], ...updatedUserData };
+          USERS_DB[userIndex] = updatedUser;
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(updatedUser));
+        }
+      });
   }
-  else {
+}else {
     res.writeHead(404, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ message: 'Oops, I cannot find that route:(' }));
+    res.end(JSON.stringify({ message: 'Oops, this route does not exist!' }));
   }
 });
 
