@@ -1,6 +1,10 @@
-
-import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+import dotenv from 'dotenv';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
+import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+
+// Load env variables
+dotenv.config();
+
 // In-memory database
 type User = {
   id: string,
