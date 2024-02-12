@@ -5,13 +5,18 @@
   "main": "index.js",
   "scripts": {
     "start:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "start:prod": "npm run build && node dist/app.js",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" --fix"
   },
   "author": "Julia Khvatova",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.11.17",
     "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "dotenv": "^16.4.1",
     "eslint": "^8.56.0",
     "nodemon": "^3.0.3",

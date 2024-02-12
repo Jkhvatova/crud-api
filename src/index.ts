@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 
@@ -12,7 +12,7 @@ type User = {
   age: number,
   hobbies: Array<string>,
 }
-let USERS_DB: User[] = [
+const USERS_DB: User[] = [
   {id: 'id1', username: 'Mememe Mumumu', age: 20, hobbies: ['music', 'sleep']},
 ];
 // API endpoints
