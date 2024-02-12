@@ -13,14 +13,11 @@ type User = {
   hobbies: Array<string>,
 }
 const USERS_DB: User[] = [
-  {id: 'id1', username: 'Mememe Mumumu', age: 20, hobbies: ['music', 'sleep']},
 ];
 // API endpoints
 const ENDPOINTS = {
   users: '/api/users',
-  user: `/api/users/{userId}`
 }
-console.log(ENDPOINTS.user.split('/')[3]);
 
 // create server
 const server: Server = createServer((req: IncomingMessage, res: ServerResponse) => {

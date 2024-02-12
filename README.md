@@ -42,3 +42,7 @@ GET http://localhost:PORT/api/users/id
 ```
 DELETE http://localhost:PORT/api/users/id
 ```
+
+#### How to test this app
+
+npm run test
