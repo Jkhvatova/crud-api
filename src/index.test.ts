@@ -1,16 +1,18 @@
 
-import {  request } from 'http';
+import http from 'http';
+
+jest.useFakeTimers();
 
 describe('User API', () => {
-  it('Get all records with a GET api/users request', (done) => {
-    const options = {
-      hostname: 'localhost',
-      port: 4000,
-      path: '/api/users',
-      method: 'GET',
-    };
+  const options = {
+    hostname: 'localhost',
+    port: 4000,
+    path: '/api/users',
+    method: 'GET',
+  };
 
-    const req = request(options, (res) => {
+  it('Get all records with a GET api/users request', (done) => {
+    const req = http.request(options, (res) => {
       let data = '';
       res.on('data', (chunk) => {
         data += chunk;
@@ -20,6 +22,11 @@ describe('User API', () => {
         expect(JSON.parse(data)).toEqual([]);
         done();
       });
+    });
+
+    req.on('error', (error) => {
+      req.end();
+      done(error);
     });
 
     req.end();
