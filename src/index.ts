@@ -21,6 +21,7 @@ const ENDPOINTS = {
 
 // create server
 const server: Server = createServer((req: IncomingMessage, res: ServerResponse) => {
+  try {
   if (req.url === ENDPOINTS.users && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(USERS_DB));
@@ -106,6 +107,11 @@ const server: Server = createServer((req: IncomingMessage, res: ServerResponse) 
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ message: 'Oops, this route does not exist!' }));
   }
+} catch (error) {
+  console.error('Internal Server Error:', error);
+  res.writeHead(500, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ message: 'Oops! Something is very wrong! You have got Internal Server Error' }));
+}
 });
 
 // Start the server
